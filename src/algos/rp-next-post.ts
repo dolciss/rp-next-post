@@ -8,9 +8,18 @@ import { subscribe } from 'diagnostics_channel'
 export const shortname = 'rp-next-post'
 
 export const handler = async (ctx: AppContext, params: QueryParams, requester: string) => {
+
+  // 購読者のRepostを今後記録するために登録
+  await ctx.db
+    .insertInto('subscriber')
+    .values({did: requester})
+    .onConflict((oc) => oc.doNothing())
+    .execute()
+
   let builder = ctx.db
     .selectFrom('post')
     .selectAll()
+    .where('post.prevRepostDid', '=', requester) // 購読者がRepostされたものだけ返す
     .orderBy('indexedAt', 'desc')
     .orderBy('cid', 'desc')
     .limit(params.limit)
@@ -31,6 +40,14 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
   const feed = res.map((row) => ({
     post: row.uri,
   }))
+  
+  console.log('getFeedSkeleton : subscription by', requester, 'cursor:', params.cursor ?? 'none', 'count:', feed.length)
+  if (!params.cursor && feed.length <= 0) {
+    return {
+      // 0件のときは待っててねPostを返す
+      feed: [{post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3k6x46j3lfy2f'}]
+    }
+  }
 
   let cursor: string | undefined
   const last = res.at(-1)
