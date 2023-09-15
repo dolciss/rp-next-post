@@ -1,4 +1,3 @@
-import { createTracing } from 'trace_events'
 import { DeleteResult } from 'kysely'
 import {
   OutputSchema as RepoEvent,
@@ -6,7 +5,6 @@ import {
 } from './lexicon/types/com/atproto/sync/subscribeRepos'
 import { FirehoseSubscriptionBase, getOpsByType } from './util/subscription'
 import { AtUri } from '@atproto/uri'
-import { CountQueuingStrategy } from 'stream/web'
 
 export class FirehoseSubscription extends FirehoseSubscriptionBase {
   async handleEvent(evt: RepoEvent) {

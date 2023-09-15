@@ -1,5 +1,3 @@
-import { Generated } from "kysely"
-
 export type DatabaseSchema = {
   subscriber: Subscriber
   repost: Repost
