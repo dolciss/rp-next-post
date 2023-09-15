@@ -1,3 +1,4 @@
+import { createTracing } from 'trace_events'
 import {
   OutputSchema as RepoEvent,
   isCommit,
@@ -27,6 +28,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
         return {
           uri: create.uri,
           cid: create.cid,
+          author: create.author,
           replyParent: create.record?.reply?.parent.uri ?? null,
           replyRoot: create.record?.reply?.root.uri ?? null,
           indexedAt: new Date().toISOString(),
