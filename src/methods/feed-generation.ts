@@ -3,7 +3,7 @@ import { Server } from '../lexicon'
 import { AppContext } from '../config'
 import algos from '../algos'
 import { validateAuth } from '../auth'
-import { AtUri } from '@atproto/uri'
+import { AtUri } from '@atproto/syntax'
 
 export default function (server: Server, ctx: AppContext) {
   const oldPublisherDid = 'did:plc:xt2h3ltab6sagq4lbpbd37m2' // l-tan.bsky.social
