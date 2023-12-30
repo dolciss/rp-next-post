@@ -39,7 +39,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
     post: row.uri,
   }))
   
-  console.log('getFeedSkeleton : subscription by', requester, 'cursor:', params.cursor ?? 'none', 'count:', feed.length)
+  console.log('getFeedSkeleton : subscription by', requester, 'cursor:', params.cursor ?? 'none', 'limit:', params.limit, 'count:', feed.length)
   if (!params.cursor && feed.length <= 0) {
     return {
       // 0件のときは待っててねPostを返す
