@@ -8,16 +8,16 @@
   "license": "MIT",
   "scripts": {
     "publishFeed": "ts-node scripts/publishFeedGen.ts",
-    "start": "ts-node src/index.ts",
+        "start": "ts-node src/index.ts",
     "build": "tsc"
   },
   "dependencies": {
-    "@atproto/api": "^0.6.20",
-    "@atproto/identity": "^0.2.1",
-    "@atproto/lexicon": "^0.2.2",
-    "@atproto/repo": "^0.3.2",
-    "@atproto/syntax": "^0.1.2",
-    "@atproto/xrpc-server": "^0.3.2",
+    "@atproto/api": "^0.7.4",
+    "@atproto/identity": "^0.3.2",
+    "@atproto/lexicon": "^0.3.1",
+    "@atproto/repo": "^0.3.6",
+    "@atproto/syntax": "^0.1.5",
+    "@atproto/xrpc-server": "^0.4.2",
     "better-sqlite3": "^8.3.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
