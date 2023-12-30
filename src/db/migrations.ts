@@ -43,3 +43,21 @@ migrations['001'] = {
     await db.schema.dropTable('sub_state').execute()
   },
 }
+migrations['002'] = {
+  async up(db: Kysely<unknown>) {
+    await db.schema.alterTable('repost')
+      .addColumn('originalUri', 'varchar')
+      .execute()
+    await db.schema.alterTable('post')
+      .addColumn('prevRepostUri', 'varchar')
+      .execute()
+    await db.schema.alterTable('post')
+      .addColumn('prevOriginalUri', 'varchar')
+      .execute()
+  },
+  async down(db: Kysely<unknown>) {
+    await db.schema.alterTable('repost').dropColumn('originalUri').execute()
+    await db.schema.alterTable('post').dropColumn('prevRepostUri').execute()
+    await db.schema.alterTable('post').dropColumn('prevOriginalUri').execute()
+  },
+}

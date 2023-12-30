@@ -13,6 +13,7 @@ export type Repost = {
   reposterDid: string
   uri: string
   originalDid: string
+  originalUri: string
 }
 
 export type Post = {
@@ -20,6 +21,8 @@ export type Post = {
   cid: string
   author: string
   prevRepostDid: string | null
+  prevRepostUri: string | null
+  prevOriginalUri: string | null
   replyParent: string | null
   replyRoot: string | null
   indexedAt: string

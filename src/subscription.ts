@@ -30,6 +30,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
         return {
           reposterDid: create.author,
           uri: create.uri,
+          originalUri: create.record.subject.uri,
           originalDid: new AtUri(create.record.subject.uri).hostname,
         }
       })
@@ -88,7 +89,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
       .selectAll()
       .where('repost.reposterDid', 'in', postAuthors)
       .execute()
-    const authorReposts = new Map(authorRepostsDB.map(author => [author.reposterDid, author.originalDid]))
+    const authorReposts = new Map(authorRepostsDB.map(author => [author.reposterDid, author]))
 
     const postsToCreate = ops.posts.creates
       .map((create) => {
@@ -97,7 +98,9 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
           uri: create.uri,
           cid: create.cid,
           author: create.author,
-          prevRepostDid: authorReposts.get(create.author) ?? null,
+          prevRepostDid: authorReposts.get(create.author)?.originalDid ?? null,
+          prevRepostUri: authorReposts.get(create.author)?.uri ?? null,
+          prevOriginalUri: authorReposts.get(create.author)?.originalUri ?? null,
           replyParent: create.record?.reply?.parent.uri ?? null,
           replyRoot: create.record?.reply?.root.uri ?? null,
           indexedAt: new Date().toISOString(),
@@ -112,7 +115,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
       if (!authorReposts.get(post.author)) {
         continue
       }
-      console.log('post', post.record.text, 'by', post.author, 'prevPostAuthor:', authorReposts.get(post.author) ?? 'none'
+      console.log('post', post.record.text, 'by', post.author, 'prevPostAuthor:', authorReposts.get(post.author)?.originalDid ?? 'none'
         , (post.record?.reply?.parent.uri ?? null) != null ? 'is Reply (No Push)' : 'is Post (Push)')
     }
 
