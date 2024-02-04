@@ -61,3 +61,13 @@ migrations['002'] = {
     await db.schema.alterTable('post').dropColumn('prevOriginalUri').execute()
   },
 }
+migrations['003'] = {
+  async up(db: Kysely<unknown>) {
+    await db.schema.alterTable('repost')
+      .addColumn('createdAt', 'varchar')
+      .execute()
+  },
+  async down(db: Kysely<unknown>) {
+    await db.schema.alterTable('repost').dropColumn('createdAt').execute()
+  },
+}

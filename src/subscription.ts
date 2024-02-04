@@ -32,6 +32,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
           uri: create.uri,
           originalUri: create.record.subject.uri,
           originalDid: new AtUri(create.record.subject.uri).hostname,
+          createdAt: create.record.createdAt
         }
       })
 
