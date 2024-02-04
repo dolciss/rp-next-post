@@ -12,7 +12,8 @@ export const validateAuth = async (
     throw new AuthRequiredError()
   }
   const jwt = authorization.replace('Bearer ', '').trim()
-  return verifyJwt(jwt, serviceDid, async (did: string) => {
+  const payload = await verifyJwt(jwt, serviceDid, async (did: string) => {
     return didResolver.resolveAtprotoKey(did)
   })
+  return payload.iss
 }
