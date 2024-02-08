@@ -81,8 +81,12 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
   }
 
   let cursor: string | undefined
-  const lastFeed = feed.at(-1)
-  const last = res.find((row) => (row.uri == lastFeed?.post || row.prevOriginalUri == lastFeed?.post))
+  let lastFeed = feed.at(-1)
+  // 最後がRepostの時はもう一つ前にする
+  if (lastFeed?.reason) {
+    lastFeed = feed.at(-2)
+  }
+  const last = res.find((row) => (row.uri == lastFeed?.post))
   if (last) {
     cursor = `${new Date(last.indexedAt).getTime()}::${last.cid}`
   }
