@@ -8,7 +8,8 @@ const run = async () => {
 
   // YOUR bluesky handle
   // Ex: user.bsky.social
-  const handle = 'l-tan.dolciss.net'
+  //const handle = 'l-tan.dolciss.net'
+  const handle = 'l-tan.bsky.social'
 
   // YOUR bluesky password, or preferably an App Password (found in your client settings)
   // Ex: abcd-1234-efgh-5678
@@ -20,7 +21,8 @@ const run = async () => {
   // A short name for the record that will show in urls
   // Lowercase with no spaces.
   // Ex: whats-hot
-  const recordName = 'rp-next-post-p'
+  const recordName = 'rp-next-post'
+  //const recordName = 'rp-next-post-p'
 
   // only update this if in a test environment
   const agent = new AtpAgent({ service: 'https://bsky.social' })

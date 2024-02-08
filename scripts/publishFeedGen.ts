@@ -8,7 +8,8 @@ const run = async () => {
 
   // YOUR bluesky handle
   // Ex: user.bsky.social
-  const handle = 'l-tan.dolciss.net'
+  //const handle = 'l-tan.dolciss.net'
+  const handle = 'l-tan.bsky.social'
 
   // YOUR bluesky password, or preferably an App Password (found in your client settings)
   // Ex: abcd-1234-efgh-5678
@@ -20,19 +21,25 @@ const run = async () => {
   // A short name for the record that will show in urls
   // Lowercase with no spaces.
   // Ex: whats-hot
-  const recordName = 'rp-next-post-p'
+  const recordName = 'rp-next-post'
+  //const recordName = 'rp-next-post-p'
 
   // A display name for your feed
   // Ex: What's Hot
-  const displayName = 'RepostNextPost+'
+  const displayName = 'RepostNextPost'
+  //const displayName = 'RepostNextPost+'
 
   // (Optional) A description of your feed
   // Ex: Top trending content from the whole network
-  const description = '「リポストの直後のポスト（とリポスト）が流れてくるフィード」です\nどのリポストに対しての直後のポストか確認できます（なおテスト中です）\nThis feed displays the Post immediately after the Repost (and repost)'
+  //const description = '「リツイートの直後のツイートを表示するやつ」( https://legacy-retweets.pronama.jp/ )にインスパイアされた「リポストの直後のポストが流れてくるフィード」です\n(まだテスト中ですので取りこぼしや接続が切れたりデータが飛んだりする可能性があります)\nThis feed displays the Post immediately after the Repost (testing now)'
+  //const description = '「リポストの直後のポスト（とリポスト）が流れてくるフィード」です\nどのリポストに対しての直後のポストか確認できます（なおテスト中です）\nThis feed displays the Post immediately after the Repost (and repost)'
+  const description = 'RepostNextPostのテストです'
 
   // (Optional) The path to an image to be used as your feed's avatar
   // Ex: ~/path/to/avatar.jpeg
-  const avatar: string = './scripts/repost-p.png'
+  //const avatar: string = './scripts/repost.png'
+  //const avatar: string = './scripts/repost-p.png'
+  const avatar: string = ''
 
   // -------------------------------------
   // NO NEED TO TOUCH ANYTHING BELOW HERE
