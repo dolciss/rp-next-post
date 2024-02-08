@@ -8,11 +8,20 @@ export const shortname = 'rp-next-post-p'
 export const handler = async (ctx: AppContext, params: QueryParams, requester: string) => {
 
   // 購読者のRepostを今後記録するために登録
-  await ctx.db
-    .insertInto('subscriber')
-    .values({did: requester})
-    .onConflict((oc) => oc.doNothing())
+  const subscriberExist = await ctx.db
+    .selectFrom('subscriber')
+    .select(qb => qb.fn.count<number>('did').as('count'))
+    .where('did', '==', requester)
     .execute()
+  const isNewSubscriber = subscriberExist.flatMap((row) => row.count)[0] === 0
+
+  if (isNewSubscriber) {
+    await ctx.db
+      .insertInto('subscriber')
+      .values({ did: requester })
+      .onConflict((oc) => oc.doNothing())
+      .execute()
+  }
 
   let builder = ctx.db
     .selectFrom('post')
@@ -39,7 +48,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
     if (row.prevOriginalUri) {
       return [{
         post: row.uri,
-      },{
+      }, {
         post: row.prevOriginalUri,
         reason: {
           $type: 'app.bsky.feed.defs#skeletonReasonRepost',
@@ -52,12 +61,22 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
       }]
     }
   }).slice(0, params.limit)
-  
-  console.log('getFeedSkeleton : subscription by', requester, 'cursor:', params.cursor ?? 'none', 'limit:', params.limit, 'count:', feed.length)
+
+  console.log('getFeedSkeleton+ : subscription by', requester, isNewSubscriber ? '(new!)' : '', 'cursor:', params.cursor ?? 'none', 'limit:', params.limit, 'count:', feed.length)
+
+  /*
+  if (requester !== 'did:plc:6zpjzzdzet62go7lnaoq4xog') {
+    return {
+      // メンテナンス(´･ω･`)
+      feed: [{ post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3kktmo5xrhq22' }]
+    }
+  }
+  */
+
   if (!params.cursor && feed.length <= 0) {
     return {
       // 0件のときは待っててねPostを返す
-      feed: [{post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3k6x46j3lfy2f'}]
+      feed: [{ post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3k6x46j3lfy2f' }]
     }
   }
 
