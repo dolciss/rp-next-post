@@ -6,6 +6,9 @@ import {
 import { FirehoseSubscriptionBase, getOpsByType } from './util/subscription'
 import { AtUri } from '@atproto/syntax'
 
+// 購読者をキャッシュする
+const cache = {}
+
 export class FirehoseSubscription extends FirehoseSubscriptionBase {
   async handleEvent(evt: RepoEvent) {
     if (!isCommit(evt)) return
@@ -37,16 +40,21 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
       })
 
     // 購読者のRepostだけ拾う
-    const subscribersDB = await this.db
-      .selectFrom('subscriber')
-      .selectAll()
-      .execute()
-    const subscribers = subscribersDB.map((subsc) => subsc.did)
+    const nowTime = Date.now()
+    if (!cache['db'] || !cache['time'] || (nowTime - cache['time']) > 10 * 1000) {
+      console.log('⌛subscribersDB set', nowTime)
+      cache['time'] = nowTime
+      cache['db'] = await this.db
+        .selectFrom('subscriber')
+        .selectAll()
+        .execute()
+    }
+    const subscribers = cache['db'].map((subsc) => subsc.did)
     
     // 元投稿者＝購読者のPostがRepostされてたらDBに突っ込んでおく
     const subscribersRepost = repostsToCreate.filter((create) => subscribers.includes(create.originalDid))
     for (const repost of subscribersRepost) {
-      console.log('Repost', repost.originalDid, '\'s Post by', repost.reposterDid)
+      console.log('Repost', repost.originalDid, '\'s Post by', repost.reposterDid, 'at', repost.createdAt)
     }
     if (subscribersRepost.length > 0) {
       await this.db
@@ -117,7 +125,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
         continue
       }
       console.log('post', post.record.text, 'by', post.author, 'prevPostAuthor:', authorReposts.get(post.author)?.originalDid ?? 'none'
-        , (post.record?.reply?.parent.uri ?? null) != null ? 'is Reply (No Push)' : 'is Post (Push)')
+        , (post.record?.reply?.parent.uri ?? null) != null ? 'is Reply (No Push)' : 'is Post (Push)', 'at', post.record.createdAt)
     }
 
     if (postsToCreate.length > 0) {
