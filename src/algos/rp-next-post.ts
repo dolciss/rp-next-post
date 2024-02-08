@@ -48,7 +48,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
     post: row.uri,
   }))
 
-  console.log('getFeedSkeleton　 : subscription by', requester, isNewSubscriber ? '(new!)' : '', 'cursor:', params.cursor ?? 'none', 'limit:', params.limit, 'count:', feed.length)
+  console.log('getFeedSkeleton  : subscription by', requester, isNewSubscriber ? '(new!)' : '', 'cursor:', params.cursor ?? 'none', 'limit:', params.limit, 'count:', feed.length)
 
   /*
   if (requester !== 'did:plc:6zpjzzdzet62go7lnaoq4xog') {
