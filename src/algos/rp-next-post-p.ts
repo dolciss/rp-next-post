@@ -74,9 +74,18 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
   */
 
   if (!params.cursor && feed.length <= 0) {
+    // 0件のときは待っててねPostを返す
+    let initialFeed: any[] = new Array()
+    initialFeed.push({ post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3kmibzyoks62s' })
+    initialFeed.push({ post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3kmicro3yhg2q' })
+    if (isNewSubscriber) {
+      initialFeed.push({ post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3kmida2r5bn2e' })
+    } else {
+      initialFeed.push({ post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3kmiddqhbu52w' })
+    }
+    initialFeed.push({ post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3kmidteiltp2k' })
     return {
-      // 0件のときは待っててねPostを返す
-      feed: [{ post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3k6x46j3lfy2f' }]
+      feed: initialFeed
     }
   }
 
