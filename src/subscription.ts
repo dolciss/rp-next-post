@@ -23,7 +23,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
         .execute()
       const deletedRows = this.totalDeleteRows(res)
       if (deletedRows > 0) {
-        console.log('Delete repost:', deletedRows)
+        console.log('[DeleteRepost]', String(deletedRows))
       }
     }
 
@@ -42,19 +42,20 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
     // 購読者のRepostだけ拾う
     const nowTime = Date.now()
     if (!cache['db'] || !cache['time'] || (nowTime - cache['time']) > 10 * 1000) {
-      console.log('⌛subscribersDB set', nowTime)
       cache['time'] = nowTime
       cache['db'] = await this.db
         .selectFrom('subscriber')
         .selectAll()
         .execute()
+      console.log('[⌛GetSubscriber]', cache['db'].length)
     }
     const subscribers = cache['db'].map((subsc) => subsc.did)
-    
+
     // 元投稿者＝購読者のPostがRepostされてたらDBに突っ込んでおく
     const subscribersRepost = repostsToCreate.filter((create) => subscribers.includes(create.originalDid))
     for (const repost of subscribersRepost) {
-      console.log('Repost', repost.originalDid, '\'s Post by', repost.reposterDid, 'at', repost.createdAt)
+      console.log('[Repost]', repost.originalDid, '\'s Post by', repost.reposterDid)
+      console.log('[Delay]', nowTime - Date.parse(repost.createdAt))
     }
     if (subscribersRepost.length > 0) {
       await this.db
@@ -73,7 +74,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
         .execute()
       const deletedRows = this.totalDeleteRows(res)
       if (deletedRows > 0) {
-        console.log('Delete prev repost:', deletedRows)
+        console.log('[DeletePrevRepost]', String(deletedRows))
       }
     }
 
@@ -86,7 +87,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
         .execute()
       const deletedRows = this.totalDeleteRows(res)
       if (deletedRows > 0) {
-        console.log('Delete post:', deletedRows)
+        console.log('[DeletePost]', String(deletedRows))
       }
     }
 
@@ -119,32 +120,33 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
         // 前回Repostがあるものだけにする
         return create.prevRepostDid != null
       })
-      
+
     for (const post of ops.posts.creates) {
       if (!authorReposts.get(post.author)) {
         continue
       }
-      console.log('post', post.record.text, 'by', post.author, 'prevPostAuthor:', authorReposts.get(post.author)?.originalDid ?? 'none'
-        , (post.record?.reply?.parent.uri ?? null) != null ? 'is Reply (No Push)' : 'is Post (Push)', 'at', post.record.createdAt)
+      console.log('[Post]', authorReposts.get(post.author)?.originalDid ?? 'none', '\'s NextPost by', post.author
+        , (post.record?.reply?.parent.uri ?? null) != null ? 'is Reply (No Push)' : 'is Post (Push)', post.record.text)
+      console.log('[Delay]', nowTime - Date.parse(post.record.createdAt))
     }
 
     if (postsToCreate.length > 0) {
       // DBに登録するのはReplyがないものだけ
-      const insertPost = postsToCreate.filter((create) => {return create.replyParent == null})
+      const insertPost = postsToCreate.filter((create) => { return create.replyParent == null })
       if (insertPost.length > 0) {
         const ins = await this.db
           .insertInto('post')
           .values(insertPost)
           .onConflict((oc) => oc.doNothing())
           .execute()
-        console.log('Insert post:', ins.length)
+        console.log('[InsertPost]', ins.length)
       }
       // Replyも含めて次のPostがあったらRepostの履歴を消す
       const del = await this.db
         .deleteFrom('repost')
         .where('reposterDid', 'in', postsToCreate.map(create => create.author))
         .execute()
-      console.log('Delete repost:', this.totalDeleteRows(del))
+      console.log('[DeleteUsedRepost]', String(this.totalDeleteRows(del)))
     }
   }
 
