@@ -31,9 +31,36 @@ const run = async () => {
 
   // (Optional) A description of your feed
   // Ex: Top trending content from the whole network
-  //const description = '「リツイート直後のツイートを表示するやつ」( https://legacy-retweets.pronama.jp/ )にインスパイアされた「リポスト直後のポストが流れてくるフィード」です\n(まだテスト中ですので取りこぼしや接続が切れたりデータが飛んだりする可能性があります)\nThis feed displays the Post immediately after the Repost (testing now)'
-  //const description = '「リポスト直後のポスト（とリポスト）が流れてくるフィード」です\nどのリポストに対しての直後のポストか確認できます（なおテスト中です）\nThis feed displays the Post immediately after the Repost (and repost)'
+  //const description = '「リツイート直後のツイートを表示するやつ」にインスパイアされた「リポスト直後のポストが流れてくるフィード」です（個人運営のため突然のエラー等ご容赦ください）\nThis feed displays the Post immediately after the Repost (under private management)\nリポストも含めた「RepostNextPost＋」もあります'
+  //const description = '「リポスト直後のポスト（とリポスト）が流れてくるフィード」です\n㊟同じポストのリポストが省略されないクライアントでご利用ください\n（個人運営のため突然のエラー等ご容赦ください）\nThis feed displays the Post immediately after the Repost (and repost) (under private management)'
   const description = 'RepostNextPostのテストです'
+
+  // (Optional) A description facets
+  /*
+  const descriptionFacets = [
+    {
+      index: {
+        byteStart: 3,
+        byteEnd: 60,
+      },
+      features: [{
+        $type: 'app.bsky.richtext.facet#link',
+        "uri": "https://legacy-retweets.pronama.jp/",
+      }],
+    },
+    {
+      index: {
+        byteStart: 346,
+        byteEnd: 363,
+      },
+      features: [{
+        $type: 'app.bsky.richtext.facet#link',
+        "uri": "https://bsky.app/profile/did:plc:6zpjzzdzet62go7lnaoq4xog/feed/rp-next-post-p",
+      }],
+    },
+  ]
+  */
+  const descriptionFacets = undefined
 
   // (Optional) The path to an image to be used as your feed's avatar
   // Ex: ~/path/to/avatar.jpeg
@@ -82,6 +109,7 @@ const run = async () => {
       description: description,
       avatar: avatarRef,
       createdAt: new Date().toISOString(),
+      descriptionFacets: descriptionFacets,
     },
   })
 
