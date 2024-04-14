@@ -125,14 +125,21 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
       if (!authorReposts.get(post.author)) {
         continue
       }
+      const isNotReply = (post.record?.reply?.parent.uri ?? null) == null
+      const repostDelayTime = nowTime - Date.parse(authorReposts.get(post.author)?.createdAt ?? nowTime.toString())
       console.log('[Post]', authorReposts.get(post.author)?.originalDid ?? 'none', '\'s NextPost by', post.author
-        , (post.record?.reply?.parent.uri ?? null) != null ? 'is Reply (No Push)' : 'is Post (Push)', post.record.text)
+        , isNotReply ? 'is Post' : 'is Reply'
+        , 'delay:' + repostDelayTime + 'ms'
+        , isNotReply && repostDelayTime < 60 * 60 * 1000 ? '(Push)' : '(No Push)', post.record.text)
       console.log('[Delay]', nowTime - Date.parse(post.record.createdAt))
     }
 
     if (postsToCreate.length > 0) {
-      // DBに登録するのはReplyがないものだけ
-      const insertPost = postsToCreate.filter((create) => { return create.replyParent == null })
+      // DBに登録するのはReplyがなく、1時間以内のものだけ
+      const insertPost = postsToCreate.filter((create) => {
+        const repostDelayTime = nowTime - Date.parse(authorReposts.get(create.author)?.createdAt ?? nowTime.toString())
+        return create.replyParent == null && repostDelayTime < 60 * 60 * 1000
+      })
       if (insertPost.length > 0) {
         const ins = await this.db
           .insertInto('post')

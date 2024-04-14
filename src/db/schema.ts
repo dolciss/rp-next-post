@@ -14,6 +14,7 @@ export type Repost = {
   uri: string
   originalDid: string
   originalUri: string
+  createdAt: string | null
 }
 
 export type Post = {
