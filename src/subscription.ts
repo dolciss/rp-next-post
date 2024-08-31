@@ -52,10 +52,11 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
     const nowTime = Date.now()
     if (!cache['db'] || !cache['time'] || (nowTime - cache['time']) > 10 * 1000) {
       cache['time'] = nowTime
-      cache['db'] = await this.db
+      const subscribers = await this.db
         .selectFrom('subscriber')
         .selectAll()
         .execute()
+      cache['db'] = subscribers.map((subsc) => subsc.did)
       console.log('[⌛GetSubscriber]', cache['db'].length)
       /*
       const post = await this.db
@@ -65,10 +66,9 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
       console.log('[💬CountPost]', post.post_count)
       */
     }
-    const subscribers = cache['db'].map((subsc) => subsc.did)
 
     // 元投稿者＝購読者のPostがRepostされてたらDBに突っ込んでおく
-    const subscribersRepost = repostsToCreate.filter((create) => subscribers.includes(create.originalDid))
+    const subscribersRepost = repostsToCreate.filter((create) => cache['db'].includes(create.originalDid))
     for (const repost of subscribersRepost) {
       console.log('[Repost]', repost.originalDid, '\'s Post by', repost.reposterDid)
       console.log('[Delay]', nowTime - Date.parse(repost.createdAt))
