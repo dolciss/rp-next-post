@@ -48,6 +48,11 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
         .selectAll()
         .execute()
       console.log('[⌛GetSubscriber]', cache['db'].length)
+      const post = await this.db
+        .selectFrom('post')
+        .select((eb) => eb.fn.count<number>('cid').as('post_count'))
+        .executeTakeFirstOrThrow()
+      console.log('[💬CountPost]', post.post_count)
     }
     const subscribers = cache['db'].map((subsc) => subsc.did)
 
