@@ -121,52 +121,39 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
       .execute()
     const authorReposts = new Map(authorRepostsDB.map(author => [author.reposterDid, author]))
 
-    const postsToCreate = ops.posts.creates
-      .map((create) => {
-        // 投稿者の前回RepostがあればRepostされた人のDIDを含めて入れる
-        return {
-          uri: create.uri,
-          cid: create.cid,
-          author: create.author,
-          prevRepostDid: authorReposts.get(create.author)?.originalDid ?? null,
-          prevRepostUri: authorReposts.get(create.author)?.uri ?? null,
-          prevOriginalUri: authorReposts.get(create.author)?.originalUri ?? null,
-          replyParent: create.record?.reply?.parent.uri ?? null,
-          replyRoot: create.record?.reply?.root.uri ?? null,
-          createdAt: create.record.createdAt,
-          indexedAt: new Date().toISOString(),
-        }
-      })
-      .filter((create) => {
-        // 前回Repostがあるものだけにする
-        return create.prevRepostDid != null
-      })
-
     for (const post of ops.posts.creates) {
-      if (!authorReposts.get(post.author)) {
+      const prevRepost = authorReposts.get(post.author)
+      if (!prevRepost) {
+        // 前回Repostがあるものだけにする
         continue
       }
       const isNotReply = (post.record?.reply?.parent.uri ?? null) == null
       const repostDelayTime = Date.parse(post.record.createdAt ?? nowTime.toString())
-                               - Date.parse(authorReposts.get(post.author)?.createdAt ?? nowTime.toString())
-      console.log('[Post]', authorReposts.get(post.author)?.originalDid ?? 'none', '\'s NextPost by', post.author
+                               - Date.parse(prevRepost?.createdAt ?? nowTime.toString())
+      // DBに登録するのはReplyがなく、1時間以内のものだけ
+      const isPush = isNotReply && repostDelayTime < 60 * 60 * 1000
+      console.log('[Post]', prevRepost?.originalDid ?? 'none', '\'s NextPost by', post.author
         , isNotReply ? 'is Post' : 'is Reply'
         , 'delay:' + repostDelayTime + 'ms'
-        , isNotReply && repostDelayTime < 60 * 60 * 1000 ? '(Push)' : '(No Push)', post.record.text)
+        , isPush ? '(Push)' : '(No Push)', post.record.text)
+      console.log('[PostTime] post:', post.record.createdAt, 'prevRepost:', prevRepost?.createdAt)
       console.log('[Delay]', nowTime - Date.parse(post.record.createdAt))
-    }
-
-    if (postsToCreate.length > 0) {
-      // DBに登録するのはReplyがなく、1時間以内のものだけ
-      const insertPost = postsToCreate.filter((create) => {
-        const repostDelayTime = Date.parse(create.createdAt ?? nowTime.toString())
-                                - Date.parse(authorReposts.get(create.author)?.createdAt ?? nowTime.toString())
-        return create.replyParent == null && repostDelayTime < 60 * 60 * 1000
-      })
-      if (insertPost.length > 0) {
+      
+      if (isPush) {
         const ins = await this.db
           .insertInto('post')
-          .values(insertPost)
+          .values({
+            uri: post.uri,
+            cid: post.cid,
+            author: post.author,
+            prevRepostDid: prevRepost?.originalDid ?? null,
+            prevRepostUri: prevRepost?.uri ?? null,
+            prevOriginalUri: prevRepost?.originalUri ?? null,
+            replyParent: post.record?.reply?.parent.uri ?? null,
+            replyRoot: post.record?.reply?.root.uri ?? null,
+            createdAt: post.record.createdAt,
+            indexedAt: new Date().toISOString(),
+          })
           .onConflict((oc) => oc.doNothing())
           .execute()
         console.log('[InsertPost]', ins.length)
@@ -174,7 +161,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
       // Replyも含めて次のPostがあったらRepostの履歴を消す
       const del = await this.db
         .deleteFrom('repost')
-        .where('reposterDid', 'in', postsToCreate.map(create => create.author))
+        .where('reposterDid', '=', post.author)
         .execute()
       console.log('[DeleteUsedRepost]', String(this.totalDeleteRows(del)))
     }
