@@ -12,8 +12,14 @@ const cache = {}
 export class FirehoseSubscription extends FirehoseSubscriptionBase {
   async handleEvent(evt: RepoEvent) {
     if (!isCommit(evt)) return
-    const ops = await getOpsByType(evt)
-    
+
+    const ops = await getOpsByType(evt).catch(e => {
+      console.error('repo subscription could not handle message', e);
+      return undefined;
+    });
+
+    if (!ops) return;
+
     if (ops.posts.creates.length == 0
         && ops.posts.deletes.length == 0
         && ops.reposts.creates.length == 0
