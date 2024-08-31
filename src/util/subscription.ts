@@ -37,10 +37,12 @@ export abstract class FirehoseSubscriptionBase {
   async run(subscriptionReconnectDelay: number) {
     try {
       for await (const evt of this.sub) {
-        this.handleEvent(evt)
-        // update stored cursor every 20 events or so
-        if (isCommit(evt) && evt.seq % 20 === 0) {
-          await this.updateCursor(evt.seq)
+        if (isCommit(evt)) {
+          this.handleEvent(evt)
+          // update stored cursor every 2000 events or so
+          if (evt.seq % 2000 === 0) {
+            await this.updateCursor(evt.seq)
+          }
         }
       }
     } catch (err) {
