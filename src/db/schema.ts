@@ -27,6 +27,7 @@ export type Post = {
   replyParent: string | null
   replyRoot: string | null
   indexedAt: string
+  createdAt: string | null
 }
 
 export type SubState = {
