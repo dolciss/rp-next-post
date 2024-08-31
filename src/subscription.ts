@@ -113,6 +113,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
           prevOriginalUri: authorReposts.get(create.author)?.originalUri ?? null,
           replyParent: create.record?.reply?.parent.uri ?? null,
           replyRoot: create.record?.reply?.root.uri ?? null,
+          createdAt: create.record.createdAt,
           indexedAt: new Date().toISOString(),
         }
       })
@@ -126,7 +127,8 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
         continue
       }
       const isNotReply = (post.record?.reply?.parent.uri ?? null) == null
-      const repostDelayTime = nowTime - Date.parse(authorReposts.get(post.author)?.createdAt ?? nowTime.toString())
+      const repostDelayTime = Date.parse(post.record.createdAt ?? nowTime.toString())
+                               - Date.parse(authorReposts.get(post.author)?.createdAt ?? nowTime.toString())
       console.log('[Post]', authorReposts.get(post.author)?.originalDid ?? 'none', '\'s NextPost by', post.author
         , isNotReply ? 'is Post' : 'is Reply'
         , 'delay:' + repostDelayTime + 'ms'
@@ -137,7 +139,8 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
     if (postsToCreate.length > 0) {
       // DBに登録するのはReplyがなく、1時間以内のものだけ
       const insertPost = postsToCreate.filter((create) => {
-        const repostDelayTime = nowTime - Date.parse(authorReposts.get(create.author)?.createdAt ?? nowTime.toString())
+        const repostDelayTime = Date.parse(create.createdAt ?? nowTime.toString())
+                                - Date.parse(authorReposts.get(create.author)?.createdAt ?? nowTime.toString())
         return create.replyParent == null && repostDelayTime < 60 * 60 * 1000
       })
       if (insertPost.length > 0) {
