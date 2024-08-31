@@ -13,6 +13,13 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
   async handleEvent(evt: RepoEvent) {
     if (!isCommit(evt)) return
     const ops = await getOpsByType(evt)
+    
+    if (ops.posts.creates.length == 0
+        && ops.posts.deletes.length == 0
+        && ops.reposts.creates.length == 0
+        && ops.reposts.deletes.length == 0) {
+      return;
+    }
 
     // Repostの削除は素直に削除
     const repostsToDelete = ops.reposts.deletes.map((del) => del.uri)
