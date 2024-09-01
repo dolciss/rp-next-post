@@ -81,3 +81,24 @@ migrations['004'] = {
     await db.schema.alterTable('post').dropColumn('createdAt').execute()
   },
 }
+migrations['005'] = {
+  async up(db: Kysely<unknown>) {
+    await db.schema.createIndex('post_uri_idx')
+      .on('post')
+      .column('uri')
+      .execute()
+    await db.schema.createIndex('repost_uri_idx')
+      .on('repost')
+      .column('uri')
+      .execute()
+    await db.schema.createIndex('repost_reposterDid_idx')
+      .on('repost')
+      .column('reposterDid')
+      .execute()
+  },
+  async down(db: Kysely<unknown>) {
+    await db.schema.dropIndex('post_uri_idx').execute()
+    await db.schema.dropIndex('repost_uri_idx').execute()
+    await db.schema.dropIndex('repost_reposterDid_idx').execute()
+  },
+}
