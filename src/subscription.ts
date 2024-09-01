@@ -58,13 +58,11 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
         .execute()
       cache['db'] = subscribers.map((subsc) => subsc.did)
       console.log('[⌛GetSubscriber]', cache['db'].length)
-      /*
       const post = await this.db
         .selectFrom('post')
         .select((eb) => eb.fn.count<number>('cid').as('post_count'))
         .executeTakeFirstOrThrow()
       console.log('[💬CountPost]', post.post_count)
-      */
     }
 
     // 元投稿者＝購読者のPostがRepostされてたらDBに突っ込んでおく
