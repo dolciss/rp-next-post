@@ -39,9 +39,9 @@ export abstract class FirehoseSubscriptionBase {
       for await (const evt of this.sub) {
         if (isCommit(evt)) {
           this.handleEvent(evt)
-          // update stored cursor every 2000 events or so
-          if (evt.seq % 2000 === 0) {
-            await this.updateCursor(evt.seq)
+          // update stored cursor every 10000 events or so
+          if (evt.seq % 10000 === 0) {
+            this.updateCursor(evt.seq)
           }
         }
       }
@@ -57,6 +57,7 @@ export abstract class FirehoseSubscriptionBase {
       .values({ service: this.service, cursor })
       .onConflict((oc) => oc.column('service').doUpdateSet({ cursor }))
       .execute()
+    console.log('[🔥Cursor]',cursor)
   }
 
   async getCursor(): Promise<{ cursor?: number }> {
