@@ -1,5 +1,5 @@
 import express from 'express'
-import { verifyJwt, AuthRequiredError } from '@atproto/xrpc-server'
+import { verifyJwt, AuthRequiredError, parseReqNsid } from '@atproto/xrpc-server'
 import { DidResolver } from '@atproto/identity'
 
 export const validateAuth = async (
@@ -12,8 +12,9 @@ export const validateAuth = async (
     throw new AuthRequiredError()
   }
   const jwt = authorization.replace('Bearer ', '').trim()
-  const payload = await verifyJwt(jwt, serviceDid, async (did: string) => {
+  const nsid = parseReqNsid(req)
+  const parsed = await verifyJwt(jwt, serviceDid, nsid, async (did: string) => {
     return didResolver.resolveAtprotoKey(did)
   })
-  return payload.iss
+  return parsed.iss
 }

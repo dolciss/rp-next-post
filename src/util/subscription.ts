@@ -47,7 +47,10 @@ export abstract class FirehoseSubscriptionBase {
       }
     } catch (err) {
       console.error('repo subscription errored', err)
-      setTimeout(() => this.run(subscriptionReconnectDelay), subscriptionReconnectDelay)
+      setTimeout(
+        () => this.run(subscriptionReconnectDelay),
+        subscriptionReconnectDelay,
+      )
     }
   }
 

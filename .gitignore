@@ -131,3 +131,7 @@ dist
 
 # Sqlite Database
 *.sqlite
+
+# intellij
+.idea/
+*.iml
