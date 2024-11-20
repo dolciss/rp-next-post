@@ -58,11 +58,15 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
         .execute()
       cache['db'] = subscribers.map((subsc) => subsc.did)
       console.log('[⌛GetSubscriber]', cache['db'].length)
-      const post = await this.db
-        .selectFrom('post')
-        .select((eb) => eb.fn.count<number>('cid').as('post_count'))
-        .executeTakeFirstOrThrow()
-      console.log('[💬CountPost]', post.post_count)
+      if (!cache['post_count'] || !cache['post_time'] || (nowTime - cache['post_time']) > 60 * 60 * 1000) {
+        cache['post_time'] = nowTime
+        const post = await this.db
+          .selectFrom('post')
+          .select((eb) => eb.fn.count<number>('uri').as('post_count'))
+          .executeTakeFirstOrThrow()
+        cache['post_count'] = post.post_count
+      }
+      console.log('[💬CountPost]', cache['post_count'])
     }
 
     // 元投稿者＝購読者のPostがRepostされてたらDBに突っ込んでおく
@@ -101,6 +105,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
         .execute()
       const deletedRows = this.totalDeleteRows(res)
       if (deletedRows > 0) {
+        cache['post_count'] = cache['post_count'] - Number(deletedRows)
         console.log('[DeletePost]', String(deletedRows))
       }
     }
@@ -150,6 +155,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
           })
           .onConflict((oc) => oc.doNothing())
           .execute()
+        cache['post_count'] = cache['post_count'] + ins.length
         console.log('[InsertPost]', ins.length)
       }
       // Replyも含めて次のPostがあったらRepostの履歴を消す
