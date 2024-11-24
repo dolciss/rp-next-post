@@ -19,7 +19,7 @@ export class Indexer {
 
   static create(cfg: IndexerConfig) {
     const db = createDb(cfg.sqliteLocation)
-    const firehose = new FirehoseSubscription(db, cfg.subscriptionEndpoint)
+    const firehose = new FirehoseSubscription(cfg.subscriptionEndpoint, cfg.subscriptionCollections, db)
 
     return new Indexer(db, firehose, cfg)
   }

@@ -1,18 +1,18 @@
 import { DeleteResult } from 'kysely'
-import { Commit as RepoEvent } from './lexicon/types/com/atproto/sync/subscribeRepos'
-import { FirehoseSubscriptionBase, getOpsByType } from './util/subscription'
+import {
+  getJetstreamOpsByType,
+  JetstreamEvent,
+  JetstreamFirehoseSubscriptionBase,
+} from "./util/jetstream-subscription";
 import { AtUri } from '@atproto/syntax'
 
 // 購読者をキャッシュする
 const cache = {}
 
-export class FirehoseSubscription extends FirehoseSubscriptionBase {
-  async handleEvent(evt: RepoEvent) {
+export class FirehoseSubscription extends JetstreamFirehoseSubscriptionBase {
+  async handleEvent(evt: JetstreamEvent) {
 
-    const ops = await getOpsByType(evt).catch(e => {
-      console.error('repo subscription could not handle message', e);
-      return undefined;
-    });
+    const ops = await getJetstreamOpsByType(evt);
 
     if (!ops) return;
 
