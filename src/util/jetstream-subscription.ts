@@ -40,12 +40,14 @@ export abstract class JetstreamFirehoseSubscriptionBase {
     let i = 0;
     try {
       for await (const evt of this.sub) {
-        this.handleEvent(evt as JetstreamEvent);
-        i++;
-        // update stored cursor every 10000 events or so
-        if (isJetstreamCommit(evt) && i % 10000 === 0) {
-          await this.updateCursor(evt.time_us);
-          i = 0;
+        if (isJetstreamCommit(evt)) {
+          this.handleEvent(evt as JetstreamEvent);
+          i++;
+          // update stored cursor every 10000 events or so
+          if (i % 10000 === 0) {
+            await this.updateCursor(evt.time_us);
+            i = 0;
+          }
         }
       }
     } catch (err) {
