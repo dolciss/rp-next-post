@@ -102,3 +102,14 @@ migrations['005'] = {
     await db.schema.dropIndex('repost_reposterDid_idx').execute()
   },
 }
+migrations['006'] = {
+  async up(db: Kysely<unknown>) {
+    await db.schema.createIndex('post_get_idx')
+      .on('post')
+      .columns(['prevRepostDid', 'indexedAt', 'cid'])
+      .execute()
+  },
+  async down(db: Kysely<unknown>) {
+    await db.schema.dropIndex('post_get_idx').execute()
+  },
+}
