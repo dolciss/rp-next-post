@@ -28,7 +28,7 @@ export abstract class JetstreamFirehoseSubscriptionBase {
         try {
           return value; // TODO validate??
         } catch (err) {
-          console.error("repo subscription skipped invalid message", err);
+          console.error('repo subscription skipped invalid message', err)
         }
       },
     });
@@ -51,11 +51,11 @@ export abstract class JetstreamFirehoseSubscriptionBase {
         }
       }
     } catch (err) {
-      console.error("repo subscription errored", err);
+      console.error('repo subscription errored', err)
       setTimeout(
         () => this.run(subscriptionReconnectDelay),
-        subscriptionReconnectDelay
-      );
+        subscriptionReconnectDelay,
+      )
     }
   }
 
@@ -70,10 +70,10 @@ export abstract class JetstreamFirehoseSubscriptionBase {
 
   async getCursor(): Promise<number | undefined> {
     const res = await this.db
-      .selectFrom("sub_state")
+      .selectFrom('sub_state')
       .selectAll()
-      .where("service", "=", this.service)
-      .executeTakeFirst();
+      .where('service', '=', this.service)
+      .executeTakeFirst()
     if (res?.cursor) {
       return res?.cursor - (60 * 1_000_000) // 1min ago
     }
@@ -172,7 +172,7 @@ export const getJetstreamOpsByType = (
   const opsByType: OperationsByType = {
     posts: { creates: [], deletes: [] },
     reposts: { creates: [], deletes: [] },
-  };
+  }
   const uri = `at://${evt?.did}/${evt?.commit?.collection}/${evt?.commit?.rkey}`
 
   if (evt?.commit?.operation === 'create') {
@@ -193,8 +193,8 @@ export const getJetstreamOpsByType = (
     }
   }
 
-  return opsByType;
-};
+  return opsByType
+}
 
 type OperationsByType = {
     posts: Operations<PostRecord>
