@@ -74,9 +74,7 @@ export abstract class JetstreamFirehoseSubscriptionBase {
       .selectAll()
       .where('service', '=', this.service)
       .executeTakeFirst()
-    if (res?.cursor) {
-      return res?.cursor - (60 * 1_000_000) // 1min ago
-    }
+      console.log('[🔥Cursor!]',res?.cursor)
     return res?.cursor;
   }
 }
