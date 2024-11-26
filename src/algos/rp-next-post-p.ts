@@ -74,7 +74,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
     }
   }
   */
-  //feed.splice(2, 0, {post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3lazttfpnuk22'})
+  //feed.splice(2, 0, {post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3lbaerccehc2l'})
 
   if (!params.cursor && feed.length <= 0) {
     // 0件のときは待っててねPostを返す
