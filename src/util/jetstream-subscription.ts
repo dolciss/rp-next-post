@@ -43,8 +43,8 @@ export abstract class JetstreamFirehoseSubscriptionBase {
         if (isJetstreamCommit(evt)) {
           this.handleEvent(evt as JetstreamEvent);
           i++;
-          // update stored cursor every 10000 events or so
-          if (i % 10000 === 0) {
+          // update stored cursor every 1000 events or so
+          if (i % 1000 === 0) {
             await this.updateCursor(evt.time_us);
             i = 0;
           }
