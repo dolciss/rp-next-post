@@ -37,7 +37,9 @@ const run = async () => {
         maybeStr(process.env.FEEDGEN_SQLITE_LOCATION) ?? ':memory:',
       subscriptionEndpoint:
         maybeStr(process.env.FEEDGEN_SUBSCRIPTION_ENDPOINT) ??
-        'wss://bsky.network',
+        'wss://jetstream1.us-west.bsky.network',
+      subscriptionCollections:
+        ['app.bsky.feed.post', 'app.bsky.feed.repost'],
       subscriptionReconnectDelay:
         maybeInt(process.env.FEEDGEN_SUBSCRIPTION_RECONNECT_DELAY) ?? 3000,
     })

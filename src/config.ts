@@ -19,5 +19,6 @@ export type Config = {
 export type IndexerConfig = {
   sqliteLocation: string
   subscriptionEndpoint: string
+  subscriptionCollections: string[]
   subscriptionReconnectDelay: number
 }
