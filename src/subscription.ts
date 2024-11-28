@@ -134,7 +134,7 @@ export class FirehoseSubscription extends JetstreamFirehoseSubscriptionBase {
       console.log('[Post]', prevRepost?.originalDid ?? 'none', '\'s NextPost by', post.author
         , isNotReply ? 'is Post' : 'is Reply'
         , 'delay:' + repostDelayTime + 'ms'
-        , isPush ? '(Push)' : '(No Push)', post.record.text)
+        , isPush ? '(Push)' : '(No Push)', post.record.text.replace(/\n/g,'<>'))
       console.log('[PostTime] post:', post.record.createdAt, 'prevRepost:', prevRepost?.createdAt)
       console.log('[Delay]', nowTime - Date.parse(post.record.createdAt))
       
