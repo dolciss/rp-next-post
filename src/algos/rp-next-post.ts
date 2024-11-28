@@ -32,17 +32,8 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
     .limit(params.limit)
 
   if (params.cursor) {
-    const [indexedAt, cid] = params.cursor.split('::')
-    if (!indexedAt || !cid) {
-      throw new InvalidRequestError('malformed cursor')
-    }
-    const timeStr = new Date(parseInt(indexedAt, 10)).toISOString()
-    builder = builder
-      .where((eb) => eb.or([
-        eb('post.indexedAt', '<', timeStr),
-        eb('post.indexedAt', '=', timeStr)
-      ]))
-      .where('post.cid', '<', cid)
+    const timeStr = new Date(parseInt(params.cursor, 10)).toISOString()
+    builder = builder.where('post.indexedAt', '<', timeStr)
   }
   const res = await builder.execute()
 
@@ -82,7 +73,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
   let cursor: string | undefined
   const last = res.at(-1)
   if (last) {
-    cursor = `${new Date(last.indexedAt).getTime()}::${last.cid}`
+    cursor = new Date(last.indexedAt).getTime().toString(10)
   }
 
   return {
