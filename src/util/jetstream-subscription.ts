@@ -74,8 +74,9 @@ export abstract class JetstreamFirehoseSubscriptionBase {
       .selectAll()
       .where('service', '=', this.service)
       .executeTakeFirst()
-      console.log('[🔥Cursor!]',res?.cursor)
-    return res?.cursor;
+    const cursor = res?.cursor ? res.cursor - 5_000_000 : undefined; // 5 sec ago
+    console.log('[🔥Cursor!]', cursor)
+    return cursor;
   }
 }
 export function isJetstreamCommit(v: unknown): v is JetstreamEvent {
