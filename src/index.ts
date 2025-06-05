@@ -42,6 +42,8 @@ const run = async () => {
         ['app.bsky.feed.post', 'app.bsky.feed.repost'],
       subscriptionReconnectDelay:
         maybeInt(process.env.FEEDGEN_SUBSCRIPTION_RECONNECT_DELAY) ?? 3000,
+      subscribersCacheIntervalMs:
+        maybeInt(process.env.FEEDGEN_SUBSCRIBERS_CACHE_INTERVAL_MS) ?? 10000,
     })
 
     await indexer.start()
