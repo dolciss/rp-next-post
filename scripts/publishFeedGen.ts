@@ -1,6 +1,6 @@
 import dotenv from 'dotenv'
 import inquirer from 'inquirer'
-import { AtpAgent, BlobRef } from '@atproto/api'
+import { AtpAgent, BlobRef, AppBskyFeedDefs } from '@atproto/api'
 import fs from 'fs/promises'
 import { ids } from '../src/lexicon/lexicons'
 
@@ -67,9 +67,15 @@ const run = async () => {
         default: '',
         required: false,
       },
+      {
+        type: 'confirm',
+        name: 'videoOnly',
+        message: 'Is this a video-only feed? If so, do you want to set the content mode to video? This will allow for an "immersive" video experience within the app.',
+        default: false,
+      }
     ])
 
-  const { handle, password, recordName, displayName, description, avatar, service } = answers
+  const { handle, password, recordName, displayName, description, avatar, service, videoOnly } = answers
 
   // (Optional) A description facets
   /*
@@ -133,6 +139,7 @@ const run = async () => {
       avatar: avatarRef,
       createdAt: new Date().toISOString(),
       descriptionFacets: descriptionFacets,
+      contentMode: videoOnly ? AppBskyFeedDefs.CONTENTMODEVIDEO : AppBskyFeedDefs.CONTENTMODEUNSPECIFIED,
     },
   })
 

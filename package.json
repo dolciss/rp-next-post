@@ -15,12 +15,13 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@atproto/api": "^0.13.16",
+    "@atproto/api": "^0.13.28",
     "@atproto/identity": "^0.4.3",
     "@atproto/lexicon": "^0.4.3",
     "@atproto/repo": "^0.5.5",
+    "@atproto/sync": "^0.1.24",
     "@atproto/syntax": "^0.3.1",
-    "@atproto/xrpc-server": "^0.7.3",
+    "@atproto/xrpc-server": "^0.7.9",
     "better-sqlite3": "^11.5.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
@@ -39,5 +40,6 @@
   "engines": {
     "node": ">= 18",
     "yarn": "1"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
