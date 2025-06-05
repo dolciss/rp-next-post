@@ -1,6 +1,6 @@
 import { WebSocketKeepAlive } from "../xrpc-server/src/stream/websocket-keepalive"
 import { Subscription } from "@atproto/xrpc-server";
-import { isObj, hasProp, RepoRecord } from "@atproto/lexicon";
+import { hasProp, isObj } from "@atproto/sync/dist/firehose/lexicons";
 import { ids } from '../lexicon/lexicons'
 import { Record as PostRecord } from '../lexicon/types/app/bsky/feed/post'
 import { Record as RepostRecord } from '../lexicon/types/app/bsky/feed/repost'
