@@ -5,8 +5,9 @@ import {
   JetstreamFirehoseSubscriptionBase,
 } from "./util/jetstream-subscription";
 import { AtUri } from '@atproto/syntax'
+import { isSubscriber } from './db/dbcache';
 
-// 購読者をキャッシュする
+// 投稿数をキャッシュする
 const cache = {}
 
 export class FirehoseSubscription extends JetstreamFirehoseSubscriptionBase {
@@ -50,14 +51,8 @@ export class FirehoseSubscription extends JetstreamFirehoseSubscriptionBase {
 
     // 購読者のRepostだけ拾う
     const nowTime = Date.now()
-    if (!cache['db'] || !cache['time'] || (nowTime - cache['time']) > 10 * 1000) {
+    if (!cache['time'] || (nowTime - cache['time']) > 10 * 1000) {
       cache['time'] = nowTime
-      const subscribers = await this.db
-        .selectFrom('subscriber')
-        .selectAll()
-        .execute()
-      cache['db'] = subscribers.map((subsc) => subsc.did)
-      console.log('[⌛GetSubscriber]', cache['db'].length)
       if (!cache['post_count'] || !cache['post_time'] || (nowTime - cache['post_time']) > 60 * 60 * 1000) {
         cache['post_time'] = nowTime
         const post = await this.db
@@ -70,7 +65,7 @@ export class FirehoseSubscription extends JetstreamFirehoseSubscriptionBase {
     }
 
     // 元投稿者＝購読者のPostがRepostされてたらDBに突っ込んでおく
-    const subscribersRepost = repostsToCreate.filter((create) => cache['db'].includes(create.originalDid))
+    const subscribersRepost = repostsToCreate.filter((create) => isSubscriber(this.db, create.originalDid))
     for (const repost of subscribersRepost) {
       console.log('[Repost]', repost.originalDid, '\'s Post by', repost.reposterDid)
       console.log('[Delay]', nowTime - Date.parse(repost.createdAt))
