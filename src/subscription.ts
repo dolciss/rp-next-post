@@ -65,7 +65,7 @@ export class FirehoseSubscription extends JetstreamFirehoseSubscriptionBase {
     }
 
     // 元投稿者＝購読者のPostがRepostされてたらDBに突っ込んでおく
-    const subscribersRepost = repostsToCreate.filter((create) => isSubscriber(this.db, create.originalDid))
+    const subscribersRepost = repostsToCreate.filter((create) => isSubscriber(create.originalDid))
     for (const repost of subscribersRepost) {
       console.log('[Repost]', repost.originalDid, '\'s Post by', repost.reposterDid)
       console.log('[Delay]', nowTime - Date.parse(repost.createdAt))

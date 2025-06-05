@@ -21,6 +21,6 @@ async function refreshSubscribersCache(db: Kysely<DatabaseSchema>) {
   console.log('[⌛GetSubscriber]', subscribersCache.size);
 }
 
-export function isSubscriber(db: Kysely<DatabaseSchema>, did: string): boolean {
+export function isSubscriber(did: string): boolean {
   return subscribersCache.has(did);
 }
