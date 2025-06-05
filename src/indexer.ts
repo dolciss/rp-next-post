@@ -1,6 +1,7 @@
 import { createDb, Database, migrateToLatest } from './db'
 import { FirehoseSubscription } from './subscription'
 import { IndexerConfig } from './config'
+import { initPostsCountCache, initSubscribersCache } from './db/dbcache'
 
 export class Indexer {
   public db: Database
@@ -26,6 +27,8 @@ export class Indexer {
 
   async start(): Promise<FirehoseSubscription> {
     await migrateToLatest(this.db)
+    initSubscribersCache(this.db, this.cfg.subscribersCacheIntervalMs)
+    initPostsCountCache(this.db, this.cfg.subscribersCacheIntervalMs, this.cfg.postCountCacheIntervalMs)
     this.firehose.run(this.cfg.subscriptionReconnectDelay)
     return this.firehose;
   }

@@ -5,9 +5,7 @@ import {
   JetstreamFirehoseSubscriptionBase,
 } from "./util/jetstream-subscription";
 import { AtUri } from '@atproto/syntax'
-
-// 購読者をキャッシュする
-const cache = {}
+import { addPostsCount, isSubscriber, subtractPostsCount } from './db/dbcache';
 
 export class FirehoseSubscription extends JetstreamFirehoseSubscriptionBase {
   async handleEvent(evt: JetstreamEvent) {
@@ -50,27 +48,8 @@ export class FirehoseSubscription extends JetstreamFirehoseSubscriptionBase {
 
     // 購読者のRepostだけ拾う
     const nowTime = Date.now()
-    if (!cache['db'] || !cache['time'] || (nowTime - cache['time']) > 10 * 1000) {
-      cache['time'] = nowTime
-      const subscribers = await this.db
-        .selectFrom('subscriber')
-        .selectAll()
-        .execute()
-      cache['db'] = subscribers.map((subsc) => subsc.did)
-      console.log('[⌛GetSubscriber]', cache['db'].length)
-      if (!cache['post_count'] || !cache['post_time'] || (nowTime - cache['post_time']) > 60 * 60 * 1000) {
-        cache['post_time'] = nowTime
-        const post = await this.db
-          .selectFrom('post')
-          .select((eb) => eb.fn.count<number>('uri').as('post_count'))
-          .executeTakeFirstOrThrow()
-        cache['post_count'] = post.post_count
-      }
-      console.log('[💬CountPost]', cache['post_count'])
-    }
-
     // 元投稿者＝購読者のPostがRepostされてたらDBに突っ込んでおく
-    const subscribersRepost = repostsToCreate.filter((create) => cache['db'].includes(create.originalDid))
+    const subscribersRepost = repostsToCreate.filter((create) => isSubscriber(create.originalDid))
     for (const repost of subscribersRepost) {
       console.log('[Repost]', repost.originalDid, '\'s Post by', repost.reposterDid)
       console.log('[Delay]', nowTime - Date.parse(repost.createdAt))
@@ -105,7 +84,7 @@ export class FirehoseSubscription extends JetstreamFirehoseSubscriptionBase {
         .execute()
       const deletedRows = this.totalDeleteRows(res)
       if (deletedRows > 0) {
-        cache['post_count'] = cache['post_count'] - Number(deletedRows)
+        subtractPostsCount(Number(deletedRows))
         console.log('[DeletePost]', String(deletedRows))
       }
     }
@@ -155,7 +134,7 @@ export class FirehoseSubscription extends JetstreamFirehoseSubscriptionBase {
           })
           .onConflict((oc) => oc.doNothing())
           .execute()
-        cache['post_count'] = cache['post_count'] + ins.length
+        addPostsCount(ins.length)
         console.log('[InsertPost]', ins.length)
       }
       // Replyも含めて次のPostがあったらRepostの履歴を消す
