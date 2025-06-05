@@ -44,6 +44,8 @@ const run = async () => {
         maybeInt(process.env.FEEDGEN_SUBSCRIPTION_RECONNECT_DELAY) ?? 3000,
       subscribersCacheIntervalMs:
         maybeInt(process.env.FEEDGEN_SUBSCRIBERS_CACHE_INTERVAL_MS) ?? 10000,
+      postCountCacheIntervalMs:
+        maybeInt(process.env.FEEDGEN_POST_COUNT_CACHE_INTERVAL_MS) ?? 3600000,
     })
 
     await indexer.start()

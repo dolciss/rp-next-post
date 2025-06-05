@@ -22,4 +22,5 @@ export type IndexerConfig = {
   subscriptionCollections: string[]
   subscriptionReconnectDelay: number
   subscribersCacheIntervalMs: number
+  postCountCacheIntervalMs: number
 }
