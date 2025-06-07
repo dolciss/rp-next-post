@@ -1,4 +1,3 @@
-import { InvalidRequestError } from '@atproto/xrpc-server'
 import { QueryParams } from '../lexicon/types/app/bsky/feed/getFeedSkeleton'
 import { AppContext } from '../config'
 
@@ -10,16 +9,29 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
   // 購読者のRepostを今後記録するために登録
   const subscriberExist = await ctx.db
     .selectFrom('subscriber')
-    .select(qb => qb.fn.count<number>('did').as('count'))
+    .selectAll()
     .where('did', '==', requester)
     .execute()
-  const isNewSubscriber = subscriberExist.flatMap((row) => row.count)[0] === 0
+  const isNewSubscriber = subscriberExist.length === 0
+  const isFirstSeenAnnounce = subscriberExist.length > 0 && !subscriberExist[0].seenAnnounce
 
   if (isNewSubscriber) {
     await ctx.db
       .insertInto('subscriber')
-      .values({ did: requester })
+      .values({
+        did: requester,
+        seenAnnounce: 0,
+        createdAt: new Date().toISOString(),
+       })
       .onConflict((oc) => oc.doNothing())
+      .execute()
+  } else if (isFirstSeenAnnounce) {
+    await ctx.db
+      .updateTable('subscriber')
+      .set({
+        seenAnnounce: 1,
+      })
+      .where('did', '=', requester)
       .execute()
   }
 
@@ -44,15 +56,18 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
   console.log('getFeedSkeleton  : subscription by', requester, isNewSubscriber ? '(new!)' : '', 'cursor:', params.cursor ?? 'none', 'limit:', params.limit, 'count:', feed.length)
 
   /*
-  if (requester !== 'did:plc:6zpjzzdzet62go7lnaoq4xog') {
+  if (requester !== 'did:plc:6zpjzzdzet62go7lnaoq4xog' && requester !== 'did:plc:xt2h3ltab6sagq4lbpbd37m2') {
     return {
       // メンテナンス(´･ω･`)
-      feed: [{ post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3kktmo5xrhq22' }]
+      feed: [{ post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3lqp6gnthjk25' }]
     }
   }
   */
-  //feed.splice(1, 0, {post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3lbz5k4soxk2l'})
-  //feed.splice(-1, 1)
+  if (isFirstSeenAnnounce) {
+    feed.splice(1, 0, {post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3lqyqrwtobs2g'})
+    feed.splice(2, 0, {post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3lqyqrxh4e22g'})
+    feed.splice(-2, 2)
+  }
 
   if (!params.cursor && feed.length <= 0) {
     // 0件のときは待っててねPostを返す
