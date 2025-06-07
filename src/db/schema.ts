@@ -7,6 +7,8 @@ export type DatabaseSchema = {
 
 export type Subscriber = {
   did: string
+  seenAnnounce: number
+  createdAt: string | null
 }
 
 export type Repost = {

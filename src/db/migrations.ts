@@ -113,3 +113,26 @@ migrations['006'] = {
     await db.schema.dropIndex('post_get_idx').execute()
   },
 }
+migrations['007'] = {
+  async up(db: Kysely<unknown>) {
+    await db.schema.alterTable('subscriber')
+      .addColumn('seenAnnounce', 'integer', (col) => col.notNull().defaultTo(0))
+      .execute()
+    await db.schema.alterTable('subscriber')
+      .addColumn('createdAt', 'varchar')
+      .execute()
+    await db.schema.createIndex('subscriber_did_idx')
+      .on('subscriber')
+      .column('did')
+      .execute()
+  },
+  async down(db: Kysely<unknown>) {
+    await db.schema.alterTable('subscriber')
+      .dropColumn('seenAnnounce')
+      .execute()
+    await db.schema.alterTable('subscriber')
+      .dropColumn('createdAt')
+      .execute()
+    await db.schema.dropIndex('subscriber_did_idx').execute()
+  }
+}
