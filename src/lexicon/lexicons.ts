@@ -5723,6 +5723,10 @@ export const schemaDict = {
               type: 'string',
               format: 'datetime',
             },
+            via: {
+              type: 'ref',
+              ref: 'lex:com.atproto.repo.strongRef',
+            }
           },
         },
       },

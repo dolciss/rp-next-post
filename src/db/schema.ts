@@ -17,6 +17,8 @@ export type Repost = {
   originalDid: string
   originalUri: string
   createdAt: string | null
+  via: string | null
+  viaDid: string | null
 }
 
 export type Post = {
@@ -30,6 +32,8 @@ export type Post = {
   replyRoot: string | null
   indexedAt: string
   createdAt: string | null
+  prevViaDid: string | null
+  prevViaUri: string | null
 }
 
 export type SubState = {
