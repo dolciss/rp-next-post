@@ -1,6 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
+import { AppBskyFeedSendInteractions } from '@atproto/api'
 import { LexiconDoc, Lexicons } from '@atproto/lexicon'
 
 export const schemaDict = {
@@ -4722,6 +4723,29 @@ export const schemaDict = {
           },
         },
       },
+      interaction: {
+        "type": "object",
+        "properties": {
+          "item": { "type": "string", "format": "at-uri" },
+          "event": {
+            "type": "string",
+            "knownValues": [
+              "app.bsky.feed.defs#requestLess",
+              "app.bsky.feed.defs#requestMore",
+              "app.bsky.feed.defs#clickthroughItem",
+              "app.bsky.feed.defs#clickthroughAuthor",
+              "app.bsky.feed.defs#clickthroughReposter",
+              "app.bsky.feed.defs#clickthroughEmbed",
+              "app.bsky.feed.defs#interactionSeen",
+              "app.bsky.feed.defs#interactionLike",
+              "app.bsky.feed.defs#interactionRepost",
+              "app.bsky.feed.defs#interactionReply",
+              "app.bsky.feed.defs#interactionQuote",
+              "app.bsky.feed.defs#interactionShare"
+            ]
+          }
+        },
+      },
     },
   },
   AppBskyFeedDescribeFeedGenerator: {
@@ -5792,6 +5816,39 @@ export const schemaDict = {
         ],
       },
     },
+  },
+  AppBskyFeedSendInteractions: {
+    lexicon: 1,
+    id: "app.bsky.feed.sendInteractions",
+    defs: {
+      main: {
+        type: "procedure",
+        description: "Send information about interactions with feed items back to the feed generator that served them.",
+        input: {
+          encoding: "application/json",
+          schema: {
+            type: "object",
+            required: ["interactions"],
+            properties: {
+              interactions: {
+                type: "array",
+                items: {
+                  type: "ref",
+                  ref: "lex:app.bsky.feed.defs#interaction"
+                }
+              }
+            }
+          }
+        },
+        output: {
+          encoding: "application/json",
+          schema: {
+            type: "object",
+            properties: {}
+          }
+        }
+      }
+    }
   },
   AppBskyFeedThreadgate: {
     lexicon: 1,

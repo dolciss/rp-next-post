@@ -323,3 +323,28 @@ export function isThreadgateView(v: unknown): v is ThreadgateView {
 export function validateThreadgateView(v: unknown): ValidationResult {
   return lexicons.validate('app.bsky.feed.defs#threadgateView', v)
 }
+
+export interface Interaction {
+  $type?: 'app.bsky.feed.defs#interaction'
+  item?: string
+  event?:
+    | 'app.bsky.feed.defs#requestLess'
+    | 'app.bsky.feed.defs#requestMore'
+    | 'app.bsky.feed.defs#clickthroughItem'
+    | 'app.bsky.feed.defs#clickthroughAuthor'
+    | 'app.bsky.feed.defs#clickthroughReposter'
+    | 'app.bsky.feed.defs#clickthroughEmbed'
+    | 'app.bsky.feed.defs#interactionSeen'
+    | 'app.bsky.feed.defs#interactionLike'
+    | 'app.bsky.feed.defs#interactionRepost'
+    | 'app.bsky.feed.defs#interactionReply'
+    | 'app.bsky.feed.defs#interactionQuote'
+    | 'app.bsky.feed.defs#interactionShare'
+    | (string & {})
+  /** Context on a feed item that was originally supplied by the feed generator on getFeedSkeleton. */
+  feedContext?: string
+  /** Unique identifier per request that may be passed back alongside interactions. */
+  reqId?: string
+}
+
+const hashInteraction = 'interaction'
