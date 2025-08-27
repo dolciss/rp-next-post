@@ -176,3 +176,20 @@ migrations['008'] = {
       .execute()
   }
 }
+migrations['009'] = {
+  async up(db: Kysely<unknown>) {
+    await db.schema.alterTable('post')
+      .addColumn('showLess', 'varchar')
+      .execute()
+    await db.schema.createIndex('post_showLess_idx')
+      .on('post')
+      .column('showLess')
+      .execute()
+  },
+  async down(db: Kysely<unknown>) {
+    await db.schema.dropIndex('post_showLess_idx').execute()
+    await db.schema.alterTable('post')
+      .dropColumn('showLess')
+      .execute()
+  }
+}

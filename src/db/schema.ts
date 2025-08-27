@@ -34,6 +34,7 @@ export type Post = {
   createdAt: string | null
   prevViaDid: string | null
   prevViaUri: string | null
+  showLess: string | null
 }
 
 export type SubState = {
