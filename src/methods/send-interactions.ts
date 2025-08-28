@@ -34,6 +34,7 @@ export default function (server: Server, ctx: AppContext) {
                             .select('uri')
                             .select('showLess')
                             .where('prevRepostDid', '=', requesterDid)
+                            .where('showLess', 'is not', null)
                             .orderBy('showLess', 'desc')
                             .executeTakeFirst()
                         if (lastShowLess?.uri) {
