@@ -12,7 +12,7 @@ export default function (server: Server, ctx: AppContext) {
         )
         input.body.interactions.forEach(async (interaction) => {
             if (interaction.item !== undefined) {
-                console.log('Processing interaction:', interaction.item, 'Event:', interaction.event);
+                console.log('[Interaction]', interaction.item, 'Event:', interaction.event);
                 const postUri = new AtUri(interaction.item)
                 switch (interaction.event) {
                     case 'app.bsky.feed.defs#requestLess':
@@ -38,7 +38,7 @@ export default function (server: Server, ctx: AppContext) {
                             .orderBy('showLess', 'desc')
                             .executeTakeFirst()
                         if (lastShowLess?.uri) {
-                            console.log('[DeleteShowLess]', lastShowLess.showLess, lastShowLess.uri)
+                            console.log('[DeleteShowLess]', lastShowLess.uri, 'ShowLess:', lastShowLess.showLess)
                             await ctx.db
                                 .updateTable('post')
                                 .set({
