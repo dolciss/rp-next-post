@@ -140,6 +140,7 @@ const run = async () => {
       createdAt: new Date().toISOString(),
       descriptionFacets: descriptionFacets,
       contentMode: videoOnly ? AppBskyFeedDefs.CONTENTMODEVIDEO : AppBskyFeedDefs.CONTENTMODEUNSPECIFIED,
+      acceptsInteractions: true,
     },
   })
 

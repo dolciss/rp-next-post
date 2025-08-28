@@ -42,7 +42,9 @@ export class FirehoseSubscription extends JetstreamFirehoseSubscriptionBase {
           uri: create.uri,
           originalUri: create.record.subject.uri,
           originalDid: new AtUri(create.record.subject.uri).hostname,
-          createdAt: create.record.createdAt
+          createdAt: create.record.createdAt,
+          via: create.record.via?.uri, 
+          viaDid: create.record.via ? new AtUri(create.record.via?.uri).hostname : null,
         }
       })
 
@@ -131,6 +133,8 @@ export class FirehoseSubscription extends JetstreamFirehoseSubscriptionBase {
             replyRoot: post.record?.reply?.root.uri ?? null,
             createdAt: post.record.createdAt,
             indexedAt: new Date().toISOString(),
+            prevViaDid: prevRepost?.viaDid ?? null,
+            prevViaUri: prevRepost?.via ?? null,
           })
           .onConflict((oc) => oc.doNothing())
           .execute()

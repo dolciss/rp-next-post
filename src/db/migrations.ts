@@ -136,3 +136,60 @@ migrations['007'] = {
     await db.schema.dropIndex('subscriber_did_idx').execute()
   }
 }
+migrations['008'] = {
+  async up(db: Kysely<unknown>) {
+    await db.schema.alterTable('repost')
+      .addColumn('via', 'varchar')
+      .execute()
+    await db.schema.alterTable('repost')
+      .addColumn('viaDid', 'varchar')
+      .execute()
+    await db.schema.createIndex('repost_viaDid_idx')
+      .on('repost')
+      .column('viaDid')
+      .execute()
+    await db.schema.alterTable('post')
+      .addColumn('prevViaDid', 'varchar')
+      .execute()
+    await db.schema.alterTable('post')
+      .addColumn('prevViaUri', 'varchar')
+      .execute()
+    await db.schema.createIndex('post_prevViaDid_idx')
+      .on('post')
+      .column('prevViaDid')
+      .execute()
+  },
+  async down(db: Kysely<unknown>) {
+    await db.schema.dropIndex('repost_viaDid_idx').execute()
+    await db.schema.alterTable('repost')
+      .dropColumn('via')
+      .execute()
+    await db.schema.alterTable('repost')
+      .dropColumn('viaDid')
+      .execute()
+    await db.schema.dropIndex('post_prevViaDid_idx').execute()
+    await db.schema.alterTable('post')
+      .dropColumn('prevViaDid')
+      .execute()
+    await db.schema.alterTable('post')
+      .dropColumn('prevViaUri')
+      .execute()
+  }
+}
+migrations['009'] = {
+  async up(db: Kysely<unknown>) {
+    await db.schema.alterTable('post')
+      .addColumn('showLess', 'varchar')
+      .execute()
+    await db.schema.createIndex('post_showLess_idx')
+      .on('post')
+      .column('showLess')
+      .execute()
+  },
+  async down(db: Kysely<unknown>) {
+    await db.schema.dropIndex('post_showLess_idx').execute()
+    await db.schema.alterTable('post')
+      .dropColumn('showLess')
+      .execute()
+  }
+}

@@ -39,6 +39,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
     .selectFrom('post')
     .selectAll()
     .where('post.prevRepostDid', '=', requester) // 購読者がRepostされたものだけ返す
+    .where('post.showLess', 'is', null) // "投稿を減らす"しているものは除外
     .orderBy('indexedAt', 'desc')
     .orderBy('cid', 'desc')
     .limit(params.limit)

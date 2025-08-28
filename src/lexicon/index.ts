@@ -90,6 +90,7 @@ import * as AppBskyFeedGetRepostedBy from './types/app/bsky/feed/getRepostedBy'
 import * as AppBskyFeedGetSuggestedFeeds from './types/app/bsky/feed/getSuggestedFeeds'
 import * as AppBskyFeedGetTimeline from './types/app/bsky/feed/getTimeline'
 import * as AppBskyFeedSearchPosts from './types/app/bsky/feed/searchPosts'
+import * as AppBskyFeedSendInteractions from './types/app/bsky/feed/sendInteractions'
 import * as AppBskyGraphGetBlocks from './types/app/bsky/graph/getBlocks'
 import * as AppBskyGraphGetFollowers from './types/app/bsky/graph/getFollowers'
 import * as AppBskyGraphGetFollows from './types/app/bsky/graph/getFollows'
@@ -1179,6 +1180,17 @@ export class FeedNS {
     >,
   ) {
     const nsid = 'app.bsky.feed.searchPosts' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  sendInteractions<AV extends AuthVerifier>(
+    cfg: ConfigOf<
+      AV,
+      AppBskyFeedSendInteractions.Handler<ExtractAuth<AV>>,
+      AppBskyFeedSendInteractions.HandlerReqCtx<ExtractAuth<AV>>
+    >,
+  ) {
+    const nsid = 'app.bsky.feed.sendInteractions' // @ts-ignore
     return this._server.xrpc.method(nsid, cfg)
   }
 }

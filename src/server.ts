@@ -5,6 +5,7 @@ import { DidResolver, MemoryCache } from '@atproto/identity'
 import { createServer } from './lexicon'
 import feedGeneration from './methods/feed-generation'
 import describeGenerator from './methods/describe-generator'
+import sendInteractions from './methods/send-interactions'
 import { createDb, Database, migrateToLatest } from './db'
 import { FirehoseSubscription } from './subscription'
 import { AppContext, Config } from './config'
@@ -51,6 +52,7 @@ export class FeedGenerator {
     }
     feedGeneration(server, ctx)
     describeGenerator(server, ctx)
+    sendInteractions(server, ctx)
     app.use(server.xrpc.router)
     app.use(wellKnown(ctx))
 
