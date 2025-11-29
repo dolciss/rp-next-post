@@ -7,7 +7,7 @@ export type DatabaseSchema = {
 
 export type Subscriber = {
   did: string
-  seenAnnounce: number
+  seenAnnounce: string | null
   createdAt: string | null
 }
 

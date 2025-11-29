@@ -193,3 +193,21 @@ migrations['009'] = {
       .execute()
   }
 }
+migrations['010'] = {
+  async up(db: Kysely<unknown>) {
+    await db.schema.alterTable('subscriber')
+      .dropColumn('seenAnnounce')
+      .execute()
+    await db.schema.alterTable('subscriber')
+      .addColumn('seenAnnounce', 'varchar')
+      .execute()
+  },
+  async down(db: Kysely<unknown>) {
+    await db.schema.alterTable('subscriber')
+      .dropColumn('seenAnnounce')
+      .execute()
+    await db.schema.alterTable('subscriber')
+      .addColumn('seenAnnounce', 'integer', (col) => col.notNull().defaultTo(0))
+      .execute()
+  }
+}
