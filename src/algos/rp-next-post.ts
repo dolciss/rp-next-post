@@ -67,11 +67,6 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
     }
   }
   */
-  if (isShowAnnounce) {
-    const insert = announce.map((uri) => ({post: uri}))
-    feed.splice(1, 0, ...insert)
-    feed.splice(-1, 1)
-  }
 
   if (!params.cursor && feed.length <= 0) {
     // 0件のときは待っててねPostを返す
@@ -87,6 +82,12 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
     return {
       feed: initialFeed
     }
+  }
+
+  if (isShowAnnounce) {
+    const insert = announce.map((uri) => ({post: uri}))
+    feed.splice(1, 0, ...insert) // 1番目に挿入
+    feed.splice(-1, 1) // 最後の1件を削除
   }
 
   let cursor: string | undefined

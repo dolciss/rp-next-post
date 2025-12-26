@@ -16,7 +16,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
   const isFirstSeenAnnounce = subscriberExist.length > 0 && !subscriberExist[0].seenAnnounce
   const firstSeenAnnounce = new Date(subscriberExist[0]?.seenAnnounce ?? '')
   // 初回かつ12時間以内なら表示
-    const isShowAnnounce = announce.length > 0 && (isFirstSeenAnnounce || firstSeenAnnounce.getTime() + (1000 * 60 * 60 * 12) > Date.now()) // 12時間
+  const isShowAnnounce = announce.length > 0 && (isFirstSeenAnnounce || firstSeenAnnounce.getTime() + (1000 * 60 * 60 * 12) > Date.now()) // 12時間
 
   if (isNewSubscriber) {
     await ctx.db
@@ -81,11 +81,6 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
     }
   }
   */
-  if (isShowAnnounce) {
-    const insert = announce.map((uri) => ({post: uri}))
-    feed.splice(1, 0, ...insert)
-    feed.splice(-1, 1)
-  }
 
   if (!params.cursor && feed.length <= 0) {
     // 0件のときは待っててねPostを返す
@@ -101,6 +96,12 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
     return {
       feed: initialFeed
     }
+  }
+
+  if (isShowAnnounce) {
+    const insert = announce.map((uri) => ({post: uri}))
+    feed.splice(2, 0, ...insert) // 2番目に挿入
+    feed.splice(-1, 2) // 最後の2件を削除
   }
 
   let cursor: string | undefined
