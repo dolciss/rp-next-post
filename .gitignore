@@ -131,6 +131,9 @@ dist
 
 # Sqlite Database
 *.sqlite
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
 
 # intellij
 .idea/
