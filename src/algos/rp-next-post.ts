@@ -1,5 +1,5 @@
 import { QueryParams } from '../lexicon/types/app/bsky/feed/getFeedSkeleton'
-import { AppContext } from '../config'
+import { AppContext, announce } from '../config'
 
 // max 15 chars
 export const shortname = 'rp-next-post'
@@ -14,13 +14,16 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
     .execute()
   const isNewSubscriber = subscriberExist.length === 0
   const isFirstSeenAnnounce = subscriberExist.length > 0 && !subscriberExist[0].seenAnnounce
+  const firstSeenAnnounce = new Date(subscriberExist[0]?.seenAnnounce ?? '')
+  // 初回かつ12時間以内なら表示
+  const isShowAnnounce = announce.length > 0 && (isFirstSeenAnnounce || firstSeenAnnounce.getTime() + (1000 * 60 * 60 * 12) > Date.now()) // 12時間
 
   if (isNewSubscriber) {
     await ctx.db
       .insertInto('subscriber')
       .values({
         did: requester,
-        seenAnnounce: 0,
+        seenAnnounce: null,
         createdAt: new Date().toISOString(),
        })
       .onConflict((oc) => oc.doNothing())
@@ -29,7 +32,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
     await ctx.db
       .updateTable('subscriber')
       .set({
-        seenAnnounce: 1,
+        seenAnnounce: new Date().toISOString(),
       })
       .where('did', '=', requester)
       .execute()
@@ -64,10 +67,10 @@ export const handler = async (ctx: AppContext, params: QueryParams, requester: s
     }
   }
   */
-  if (isFirstSeenAnnounce) {
-    feed.splice(1, 0, {post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3lqyqrwtobs2g'})
-    feed.splice(2, 0, {post: 'at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3lqyqrxh4e22g'})
-    feed.splice(-2, 2)
+  if (isShowAnnounce) {
+    const insert = announce.map((uri) => ({post: uri}))
+    feed.splice(1, 0, ...insert)
+    feed.splice(-1, 1)
   }
 
   if (!params.cursor && feed.length <= 0) {

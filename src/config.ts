@@ -24,3 +24,5 @@ export type IndexerConfig = {
   subscribersCacheIntervalMs: number
   postCountCacheIntervalMs: number
 }
+
+export const announce = ['at://did:plc:xt2h3ltab6sagq4lbpbd37m2/app.bsky.feed.post/3mavhf7ohss2v'] as string[]
