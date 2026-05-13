@@ -15,9 +15,9 @@ export class FirehoseSubscription extends JetstreamFirehoseSubscriptionBase {
     if (!ops) return;
 
     if (ops.posts.creates.length == 0
-        && ops.posts.deletes.length == 0
-        && ops.reposts.creates.length == 0
-        && ops.reposts.deletes.length == 0) {
+      && ops.posts.deletes.length == 0
+      && ops.reposts.creates.length == 0
+      && ops.reposts.deletes.length == 0) {
       return;
     }
 
@@ -36,6 +36,7 @@ export class FirehoseSubscription extends JetstreamFirehoseSubscriptionBase {
 
     // Repostに元投稿者のDIDを添える
     const repostsToCreate = ops.reposts.creates
+      .filter((create) => create.record?.subject?.uri)
       .map((create) => {
         return {
           reposterDid: create.author,
@@ -43,7 +44,7 @@ export class FirehoseSubscription extends JetstreamFirehoseSubscriptionBase {
           originalUri: create.record.subject.uri,
           originalDid: new AtUri(create.record.subject.uri).hostname,
           createdAt: create.record.createdAt,
-          via: create.record.via?.uri, 
+          via: create.record.via?.uri,
           viaDid: create.record.via ? new AtUri(create.record.via?.uri).hostname : null,
         }
       })
@@ -109,16 +110,16 @@ export class FirehoseSubscription extends JetstreamFirehoseSubscriptionBase {
       }
       const isNotReply = (post.record?.reply?.parent.uri ?? null) == null
       const repostDelayTime = Date.parse(post.record.createdAt ?? nowTime.toString())
-                               - Date.parse(prevRepost?.createdAt ?? nowTime.toString())
+        - Date.parse(prevRepost?.createdAt ?? nowTime.toString())
       // DBに登録するのはReplyがなく、1時間以内のものだけ
       const isPush = isNotReply && repostDelayTime < 60 * 60 * 1000
       console.log('[Post]', prevRepost?.originalDid ?? 'none', '\'s NextPost by', post.author
         , isNotReply ? 'is Post' : 'is Reply'
         , 'delay:' + repostDelayTime + 'ms'
-        , isPush ? '(Push)' : '(No Push)', post.record.text.replace(/\n/g,'<>'))
+        , isPush ? '(Push)' : '(No Push)', post.record.text.replace(/\n/g, '<>'))
       console.log('[PostTime] post:', post.record.createdAt, 'prevRepost:', prevRepost?.createdAt)
       console.log('[Delay]', nowTime - Date.parse(post.record.createdAt))
-      
+
       if (isPush) {
         const ins = await this.db
           .insertInto('post')
