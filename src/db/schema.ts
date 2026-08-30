@@ -19,6 +19,7 @@ export type Repost = {
   createdAt: string | null
   via: string | null
   viaDid: string | null
+  indexedAt: string | null
 }
 
 export type Post = {

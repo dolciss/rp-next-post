@@ -211,3 +211,21 @@ migrations['010'] = {
       .execute()
   }
 }
+migrations['011'] = {
+  async up(db: Kysely<unknown>) {
+    await db.schema.alterTable('repost')
+      .addColumn('indexedAt', 'varchar')
+      .execute()
+    await db.schema.createIndex('repost_indexedAt_idx')
+      .on('repost')
+      .column('indexedAt')
+      .execute()
+  },
+  async down(db: Kysely<unknown>) {
+    await db.schema.dropIndex('repost_indexedAt_idx').execute()
+    await db.schema.alterTable('repost')
+      .dropColumn('indexedAt')
+      .execute()
+  }
+}
+

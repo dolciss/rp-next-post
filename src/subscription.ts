@@ -46,6 +46,7 @@ export class FirehoseSubscription extends JetstreamFirehoseSubscriptionBase {
           createdAt: create.record.createdAt,
           via: create.record.via?.uri,
           viaDid: create.record.via ? new AtUri(create.record.via?.uri).hostname : null,
+          indexedAt: new Date().toISOString(),
         }
       })
 
